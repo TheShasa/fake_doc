@@ -18,7 +18,7 @@ if __name__ == "__main__":
 
         is_fake = IsFakePhoto(crop)
         print('Magic words is ok:', is_fake.has_magic_words(debug=True))
-        print('Magic bolndess is ok:', is_fake.width_is_ok(debug=True))
+        print('Magic boldness is ok:', is_fake.width_is_ok(debug=True))
         print('Color of words is ok:', is_fake.color_is_ok(debug=True))
         is_fake.save_debuged_image()
 

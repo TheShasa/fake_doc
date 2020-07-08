@@ -10,24 +10,24 @@ from helper_class import Helper
 class IsFakePhoto:
     magic_words = ['driving', 'licence', 'state', 'israel']
 
-    magic_words_area_mean = {'driving': 1849.2,
-                             'licence': 1928.2,
-                             'state': 597.8,
-                             'israel': 728.8}
-    magic_words_area_std = {'driving': 95.52884381169909,
-                            'licence': 96.8574209856942,
-                            'state': 52.51818732591596,
-                            'israel': 47.9432998447124}
+    magic_words_area_mean = {'driving': 1876.666666666666,
+                             'licence': 1935.6666666666667,
+                             'state': 604.6666666666666,
+                             'israel': 744.6666666666666}
+    magic_words_area_std = {'driving': 114.77611056119456,
+                            'licence': 114.43872693377108,
+                            'state': 36.7544403968947,
+                            'israel': 49.30404536028346}
 
-    mean_colors = np.array([[103.625, 102.58333333, 99.16666667],
-                            [158.2, 106.3, 84.],
-                            [169.8, 137.1, 120.8],
-                            [127.33333333, 126.02083333, 124.97916667]])
+    mean_colors = np.array([[119., 114.93333333, 108.66666667],
+                            [176.5, 122.5, 90.16666667],
+                            [188.83333333, 150.83333333, 127.16666667],
+                            [152.78571429, 146.53571429, 139.78571429]])
 
-    std_colors = np.array([[30.74330889, 23.57597058, 17.97838208],
-                           [31.13454673, 21.72579112, 20.174241],
-                           [33.54042337, 21.3703065, 13.81158934],
-                           [46.63481056, 38.45695081, 31.17256378]])
+    std_colors = np.array([[12.44722191, 8.99234242, 9.85675178],
+                           [11.17661249, 10.87428159, 18.94216343],
+                           [11.63925351, 7.92499562, 14.11165791],
+                           [16.1297355, 13.91679905, 15.37938589]])
 
     img_size = (800, 500)
 
@@ -203,8 +203,11 @@ class IsFakePhoto:
         ax.imshow(cv2.cvtColor(self.img, cv2.COLOR_BGR2RGB))
         for dict_, area in self.debug_area_words:
             x, y = dict_['x'], dict_['y']
+            w, h = dict_['w'], dict_['h']
             plt.text(x, y, str(x) + ' ' + str(y) + ' ' + str(area),
                      horizontalalignment='left', color='b', verticalalignment='bottom', fontsize=20)
+            rect = patches.Rectangle((x, y), w, h, linewidth=3, edgecolor='b', facecolor='none')
+            ax.add_patch(rect)
         for dict_, mean in self.debug_color_words:
             x, y = dict_['x'], dict_['y']
             w, h = dict_['w'], dict_['h']
