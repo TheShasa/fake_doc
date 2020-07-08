@@ -19,15 +19,15 @@ class IsFakePhoto:
                             'state': 36.7544403968947,
                             'israel': 49.30404536028346}
 
-    mean_colors = np.array([[119., 114.93333333, 108.66666667],
-                            [176.5, 122.5, 90.16666667],
-                            [188.83333333, 150.83333333, 127.16666667],
-                            [152.78571429, 146.53571429, 139.78571429]])
+    mean_colors = np.array([[71.33333333, 35.04166667, 123.75],
+                            [98.9, 45.7, 202.9],
+                            [95.6, 34.8, 205.2],
+                            [70.02083333, 34.10416667, 150.66666667]])
 
-    std_colors = np.array([[12.44722191, 8.99234242, 9.85675178],
-                           [11.17661249, 10.87428159, 18.94216343],
-                           [11.63925351, 7.92499562, 14.11165791],
-                           [16.1297355, 13.91679905, 15.37938589]])
+    std_colors = np.array([[36.46192839, 17.50828177, 11.42092378],
+                           [8.96046874, 14.69727866, 35.78672938],
+                           [11.5082579, 14.35827288, 38.48324311],
+                           [42.77484151, 17.91093658, 21.90446428]])
 
     img_size = (800, 500)
 
@@ -150,6 +150,7 @@ class IsFakePhoto:
         '''check if color of words is ok
         '''
         im = self.img
+        im_hsv = cv2.cvtColor(im, cv2.COLOR_BGR2HSV)
 
         if self.ocr is None:
             self.prepare_ocr_dict()
@@ -165,7 +166,7 @@ class IsFakePhoto:
             if (contains_digit and contains_letters) or (not contains_letters and not contains_digit):
                 continue
 
-            mean, area = self.word_area(im, dict_)
+            mean, area = self.word_area(im_hsvg, dict_)
             color_class = -1
 
             if self.our_word(word, x, y):
