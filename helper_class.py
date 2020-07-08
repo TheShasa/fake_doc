@@ -18,8 +18,37 @@ class Helper:
         return img[top:bottom, left:right, :]
 
     @staticmethod
+    def crop_from_point(img, point, perc_x, perc_y, size_x, size_y):
+        x, y = point
+        height = img.shape[0]
+        width = img.shape[1]
+
+        left = x + int(perc_x * width)
+        right = left + int(size_x * width)
+
+        top = y + int(perc_y * height)
+        bottom = top + int(size_y * height)
+
+        left = min(width, max(left, 0))
+        right = min(right, width)
+        top = min(height, max(top, 0))
+        bottom = min(height, bottom)
+
+        return img[top:bottom, left:right], left, top
+
+    @staticmethod
+    def crop_photo_area_pixel(img, left, top, right, bottom):
+        height = img.shape[0]
+        width = img.shape[1]
+        left = min(width, max(left, 0))
+        right = min(right, width)
+        top = min(height, max(top, 0))
+        bottom = min(height, bottom)
+        return img[top:bottom, left:right, :]
+
+    @staticmethod
     def draw_boxes(img):
-        d = pytesseract.image_to_data(img, output_type=Output.DICT,  # lang='hebrew',
+        d = pytesseract.image_to_data(img, output_type=Output.DICT,
                                       config='--oem 3')
         n_boxes = len(d['level'])
         array_of_dicts = []
@@ -29,7 +58,11 @@ class Helper:
 
             (word, x, y, w, h) = (d['text'][i], d['left'][i], d['top'][i], d['width'][i], d['height'][i])
 
-            if word == '' or word == ' ':
+            word = word.replace(' ', '')
+            word = word.replace('.', '')
+            word = word.lower()
+
+            if len(word) <= 2:
                 continue
             dict_ = {
                 'word': word,
@@ -43,32 +76,16 @@ class Helper:
         return array_of_dicts
 
     @staticmethod
-    def crop_from_point(img, point, perc_x, perc_y, size_x, size_y):
-        x, y = point
-        height = img.shape[0]
-        width = img.shape[1]
-
-        left = x + int(perc_x * width)
-        right = left + int(size_x * width)
-
-        top = y + int(perc_y * height)
-        bottom = top + int(size_y * height)
-
-        left = max(left, 0)
-        right = min(right, width)
-        top = max(top, 0)
-        bottom = min(height, bottom)
-
-        return img[top:bottom, left:right], left, top
-
-    @staticmethod
-    def one_corner(th, func):
+    def one_corner(th):
+        '''
+        find middle corner
+        '''
         height = th.shape[0]
         width = th.shape[1]
         corners = cv2.goodFeaturesToTrack(th, 155, 0.1, 10)
         if corners is not None:
             corners = np.int0(corners)
-            x, y = func(th, corners)
+            x, y = Helper.find_closest_to_center(th, corners)
 
             return x, y
         return int(width / 2), int(height / 2)
@@ -108,7 +125,7 @@ class Helper:
     def find_4_in_paralegram(first1, first2, second1):
         '''
             first 1 and first2 - two opposite points
-            second 2 - points whcih we does not know the opposite
+            second 2 - points which we does not know the opposite
         '''
         f1_x, f1_y = first1
         f2_x, f2_y = first2
@@ -141,6 +158,9 @@ class Helper:
 
     @staticmethod
     def angle(point1, point2):
+        '''
+        angle of line which lies through point1 and point2
+        '''
         x1 = point1[0]
         y1 = point1[1]
         x2 = point2[0]
@@ -153,10 +173,12 @@ class Helper:
         return abs(np.arctan(y_catet / x_catet))
 
     @staticmethod
-    def crop_photo_area_pixel(img, left, top, right, bottom):
-        return img[top:bottom, left:right, :]
-
     def get_lowest_line(img_cropped):
+        '''
+        find lowest horizontal line
+        :param img_cropped:
+        :return:
+        '''
         (mu, sigma) = cv2.meanStdDev(cv2.cvtColor(img_cropped, cv2.COLOR_BGR2GRAY))
         edges = cv2.Canny(img_cropped, mu - sigma, mu + sigma)
         lines = cv2.HoughLines(edges, 1, np.pi / 180, 60)
@@ -178,9 +200,6 @@ class Helper:
                 if y0 > max_y:
                     max_y = y0
                     max_line = line
-        #             print((x1,y1),(x2,y2))
-        #             print(angle((x1,y1),(x2,y2)))
-        #             cv2.line(line_image, (x1, y1), (x2, y2), (0, 0, 255), 2)
 
         if max_line is not None:
             rho, theta = max_line[0][0], max_line[0][1]
@@ -195,6 +214,7 @@ class Helper:
             return (x1, y1, x2, y2)
         return (0, 0, 0, 0)
 
+    @staticmethod
     def good_corners(img, corner_numbers=[]):
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
@@ -209,11 +229,12 @@ class Helper:
     @staticmethod
     def find_corner(img, corners, corner_num):
         '''
-            corner_num = 0 - left top
-            corner_num = 1  - right top
-            corner_num = 2 - right_bottom
-            corner_num = 3 - left_bottom
+        corner_num = 0 - left top
+        corner_num = 1  - right top
+        corner_num = 2 - right_bottom
+        corner_num = 3 - left_bottom
         '''
+
         shape = img.shape
 
         min_ = 0
@@ -238,6 +259,13 @@ class Helper:
 
     @staticmethod
     def projection_on_line(point1, point2, point):
+        '''
+        project point on line which lies through point1 and point2
+        :param point1:
+        :param point2:
+        :param point:
+        :return:
+        '''
         x1 = point1[0]
         y1 = point1[1]
         x2 = point2[0]

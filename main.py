@@ -17,11 +17,11 @@ if __name__ == "__main__":
         crop = photo.get_correct_crop()
 
         is_fake = IsFakePhoto(crop)
-        print(is_fake.has_magic_words(debug=True))
-        print(is_fake.width_is_ok(debug=True))
-        print(is_fake.color_is_ok(debug=True))
+        print('Magic words is ok:', is_fake.has_magic_words(debug=True))
+        print('Magic bolndess is ok:', is_fake.width_is_ok(debug=True))
+        print('Color of words is ok:', is_fake.color_is_ok(debug=True))
         is_fake.save_debuged_image()
 
-    # except:
-    #     print('not cropped')
-    #     strange_words(img, True)
+        # except:
+        #     print('not cropped')
+        #     strange_words(img, True)
