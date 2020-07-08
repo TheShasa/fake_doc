@@ -166,7 +166,7 @@ class IsFakePhoto:
             if (contains_digit and contains_letters) or (not contains_letters and not contains_digit):
                 continue
 
-            mean, area = self.word_area(im_hsvg, dict_)
+            mean, area = self.word_area(im_hsv, dict_)
             color_class = -1
 
             if self.our_word(word, x, y):
